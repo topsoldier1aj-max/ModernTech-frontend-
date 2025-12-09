@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard</title>
+    <link rel="stylesheet" href="employee-dashboard.css">
+</head>
+<body>
+    <header>
+        <h1>ModernTech-Solutions</h1>
+        <img class="profileicon" src="data:image/jpeg;base64,/9j/4AAQSk..." alt="Profile Icon">
+    </header>
+
+    <div class="dashboarditems">
+        <img class="profileicon" src="data:image/jpeg;base64,/9j/4AAQSk..." alt="Profile Picture">
+        <h2 id="empName">John Smith</h2>
+        <h6 id="empRole">Software Developer</h6>
+        <div class="status-toggle">
+            <label>Active Status:
+                <label class="switch">
+                    <input type="checkbox" id="activeStatus" checked>
+                    <span class="slider"></span>
+                </label>
+                <span id="activeLabel">Active</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="button-container">
+        <button class="main-btn" id="updateBtn">Update Profile</button>
+        <button class="main-btn" id="actionsBtn">Actions</button>
+    </div>
+
+    <!-- Update Profile Modal -->
+    <div class="modal" id="updateModal">
+        <div class="modal-content">
+            <span class="close" id="closeUpdate">&times;</span>
+            <h3>Update Profile</h3>
+            <div class="update-form">
+                <input type="text" placeholder="Enter new name" id="newName">
+                <input type="email" placeholder="Enter new email" id="newEmail">
+                <input type="password" placeholder="Enter new password" id="newPassword">
+                <button id="saveBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions Modal -->
+    <div class="modal" id="actionsModal">
+        <div class="modal-content">
+            <span class="close" id="closeActions">&times;</span>
+            <h3>Actions</h3>
+            <div class="actions-buttons">
+                <button class="main-btn" id="leaveBtn">Leave</button>
+                <button class="main-btn" id="payrollBtn">Payroll</button>
+            </div>
+            <div id="actionContent" class="action-content"></div>
+        </div>
+    </div>
+
+    <script src="employee-dashboard.js"></script>
+</body>
+</html>
