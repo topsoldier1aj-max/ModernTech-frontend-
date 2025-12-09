@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Employee List Example</title>
+
+  <style>
+    /* reset / ensure full width behavior */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+
+    /* container so rows don't overflow the viewport horizontally */
+    .container {
+      max-width: 100%; /* fill the screen width */
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* list reset */
+    #employeeList {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      width: 100%;
+    }
+
+    /* each item fills width and looks like a row */
+    #employeeList .e-item {
+      display: block;          /* make <li> behave like a block row */
+      width: 100%;             /* fill parent width */
+      padding: 16px 20px;      /* spacing inside each row */
+      border-bottom: 1px solid #e0e0e0; /* divider line */
+      background: #fff;        /* background color for contrast */
+      font-size: 16px;
+      color: #222;
+      align-items: center;
+    }
+
+    /* hover for visual feedback */
+    #employeeList .e-item:hover {
+      background-color: #f8faff;
+    }
+
+    /* unread indicator: red vertical bar on the left */
+    #employeeList .e-item[data-unread="true"] {
+      border-left: 6px solid #e53935; /* unread red bar */
+      padding-left: 14px; /* keep content aligned after the bar */
+    }
+
+    /* last item: remove bottom border if you prefer */
+    #employeeList .e-item:last-child {
+      border-bottom: none;
+    }
+
+    /* responsive: keep text readable on small screens */
+    @media (max-width: 480px) {
+      #employeeList .e-item { padding: 12px 14px; font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <ul id="employeeList">
+      <li data-department="HR" data-unread="true" class="e-item">John Smith - HR</li>
+      <li data-department="Finance" data-unread="false" class="e-item">Mary Johnson - Finance</li>
+      <li data-department="Development" data-unread="true" class="e-item">Mark David - Development</li>
+      <li data-department="Sales" data-unread="false" class="e-item">Ayesha Khan - Sales</li>
+    </ul>
+  </div>
+</body>
+</html>

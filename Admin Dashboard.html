@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Moderntech-solutions — Employee Directory</title>
+
+  <!-- Link to the separate stylesheet -->
+  <link rel="stylesheet" href="admin-dashboard.css" />
+
+  <!-- Icons (optional). Remove if not needed. -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header" role="banner">
+    <button class="menu-button" aria-label="Open menu" title="Menu">
+      <!-- Simple menu icon -->
+      <span class="menu-icon" aria-hidden="true"></span>
+    </button>
+    <h1 class="app-title">Moderntech-solutions</h1>
+  </header>
+
+  <main class="container" role="main">
+    <!-- Search + Filters Box -->
+    <section class="search-box" aria-label="Search and filters">
+      <div class="search-row">
+        <div class="search-input-wrap" role="search">
+          <span class="search-icon" aria-hidden="true"></span>
+          <input
+            id="searchInput"
+            type="text"
+            class="search-input"
+            placeholder="Search employees"
+            aria-label="Search employees by name"
+            autocomplete="off"
+          />
+          <button id="clearSearchBtn" class="clear-btn" aria-label="Clear search" title="Clear">×</button>
+        </div>
+
+        <div class="search-actions">
+          <button id="filterToggleBtn" class="btn ghost" aria-expanded="false" aria-controls="deptPanel">
+            Filter
+          </button>
+          <button id="unreadToggleBtn" class="btn success-outline" aria-pressed="false" title="Show only employees with unread notifications">
+            Unread
+          </button>
+        </div>
+      </div>
+
+      <!-- Department panel (expands under the box using transitions) -->
+      <div id="deptPanel" class="dept-panel" aria-hidden="true">
+        <div class="dept-buttons">
+          <!-- Buttons populated by JS -->
+        </div>
+        <div class="dept-actions">
+          <button id="clearFiltersBtn" class="btn ghost">Clear filters</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results header -->
+    <section class="results-header" aria-live="polite">
+      <div class="results-summary">
+        <span id="resultsCount">0</span>
+        <span class="results-label">employees</span>
+      </div>
+    </section>
+
+    <!-- Employee list -->
+    <section id="employeeList" class="employee-list" aria-label="Employee results">
+      <!-- Cards populated by JS -->
+    </section>
+  </main>
+
+  <!-- Footer (optional) -->
+  <footer class="app-footer">
+    <small>© <span id="yearSpan"></span> Moderntech-solutions</small>
+  </footer>
+
+  <script>
+    // ----- Sample Data -----
+    const departments = [
+      { id: "engineering", name: "Engineering" },
+      { id: "design", name: "Design" },
+      { id: "product", name: "Product" },
+      { id: "sales", name: "Sales" },
+      { id: "hr", name: "HR" }
+    ];
+
+    const employees = [
+      { id: 1, name: "Aisha Khan", dept: "Engineering", unread: 2, avatar: "AK" },
+      { id: 2, name: "Michael Smith", dept: "Design", unread: 0, avatar: "MS" },
+      { id: 3, name: "Zanele Dlamini", dept: "Product", unread: 5, avatar: "ZD" },
+      { id: 4, name: "Thabo Mbeki", dept: "Sales", unread: 1, avatar: "TM" },
+      { id: 5, name: "Liam Patel", dept: "Engineering", unread: 0, avatar: "LP" },
+      { id: 6, name: "Nomsa Nkosi", dept: "HR", unread: 3, avatar: "NN" },
+      { id: 7, name: "Emily Chen", dept: "Product", unread: 0, avatar: "EC" },
+      { id: 8, name: "Carlos Alvarez", dept: "Sales", unread: 4, avatar: "CA" }
+    ];
+
+    // ----- State -----
+    const state = {
+      query: "",
+      showUnreadOnly: false,
+      activeDepts: new Set(),
+      filterOpen: false
+    };
+
+    // ----- DOM -----
+    const searchInput = document.getElementById("searchInput");
+    const clearSearchBtn = document.getElementById("clearSearchBtn");
+    const filterToggleBtn = document.getElementById("filterToggleBtn");
+    const unreadToggleBtn = document.getElementById("unreadToggleBtn");
+    const deptPanel = document.getElementById("deptPanel");
+    const deptButtonsWrap = deptPanel.querySelector(".dept-buttons");
+    const clearFiltersBtn = document.getElementById("clearFiltersBtn");
+    const employeeList = document.getElementById("employeeList");
+    const resultsCount = document.getElementById("resultsCount");
+    const yearSpan = document.getElementById("yearSpan");
+
+    // ----- Utils -----
+    function renderDeptButtons() {
+      deptButtonsWrap.innerHTML = "";
+      departments.forEach(d => {
+        const btn = document.createElement("button");
+        btn.className = "btn dept-btn";
+        btn.type = "button";
+        btn.textContent = d.name;
+        btn.setAttribute("data-dept", d.name);
+        btn.setAttribute("aria-pressed", state.activeDepts.has(d.name) ? "true" : "false");
+        btn.addEventListener("click", () => {
+          if (state.activeDepts.has(d.name)) {
+            state.activeDepts.delete(d.name);
+          } else {
+            state.activeDepts.add(d.name);
+          }
+          btn.setAttribute("aria-pressed", state.activeDepts.has(d.name) ? "true" : "false");
+          renderEmployees();
+        });
+        deptButtonsWrap.appendChild(btn);
+      });
+    }
+
+    function normalize(str) {
+      return str.toLowerCase().trim();
+    }
+
+    function filterEmployees() {
+      return employees.filter(emp => {
+        const matchesQuery = !state.query || normalize(emp.name).includes(normalize(state.query));
+        const matchesUnread = !state.showUnreadOnly || emp.unread > 0;
+        const matchesDept =
+          state.activeDepts.size === 0 || state.activeDepts.has(emp.dept);
+        return matchesQuery && matchesUnread && matchesDept;
+      });
+    }
+
+    function renderEmployees() {
+      const data = filterEmployees();
+      resultsCount.textContent = data.length;
+
+      employeeList.innerHTML = "";
+      if (data.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty-state";
+        empty.textContent = "No employees match your filters.";
+        employeeList.appendChild(empty);
+        return;
+      }
+
+      data.forEach(emp => {
+        const card = document.createElement("article");
+        card.className = "employee-card";
+        card.setAttribute("tabindex", "0");
+        card.setAttribute("aria-label", `${emp.name}, ${emp.dept} department`);
+
+        // Avatar: small, circular, left
+        const avatar = document.createElement("div");
+        avatar.className = "avatar";
+        avatar.textContent = emp.avatar;
+
+        // Name
+        const name = document.createElement("div");
+        name.className = "emp-name";
+        name.textContent = emp.name;
+
+        // Update button (blue with white text)
+        const updateBtn = document.createElement("button");
+        updateBtn.className = "btn primary";
+        updateBtn.type = "button";
+        updateBtn.textContent = "Update employee";
+        updateBtn.addEventListener("click", () => {
+          alert(`Update requested for ${emp.name}`);
+        });
+
+        // Unread notifications button (green with white text)
+        const unreadBtn = document.createElement("button");
+        unreadBtn.className = "btn success";
+        unreadBtn.type = "button";
+        unreadBtn.innerHTML = `Unread <span class="badge">${emp.unread}</span>`;
+        unreadBtn.disabled = emp.unread === 0;
+        unreadBtn.addEventListener("click", () => {
+          if (emp.unread > 0) {
+            alert(`${emp.name} has ${emp.unread} unread notifications`);
+          }
+        });
+
+        // Layout: avatar -> name -> update -> unread
+        const row = document.createElement("div");
+        row.className = "card-row";
+        row.appendChild(avatar);
+        row.appendChild(name);
+        row.appendChild(updateBtn);
+        row.appendChild(unreadBtn);
+
+        // Department tag (optional extra)
+        const deptTag = document.createElement("div");
+        deptTag.className = "dept-tag";
+        deptTag.textContent = emp.dept;
+
+        card.appendChild(row);
+        card.appendChild(deptTag);
+        employeeList.appendChild(card);
+      });
+    }
+
+    function setFilterOpen(open) {
+      state.filterOpen = open;
+      filterToggleBtn.setAttribute("aria-expanded", open ? "true" : "false");
+      deptPanel.setAttribute("aria-hidden", open ? "false" : "true");
+      deptPanel.classList.toggle("open", open);
+    }
+
+    // ----- Events -----
+    searchInput.addEventListener("input", (e) => {
+      state.query = e.target.value;
+      renderEmployees();
+      clearSearchBtn.classList.toggle("visible", !!state.query);
+    });
+
+    clearSearchBtn.addEventListener("click", () => {
+      state.query = "";
+      searchInput.value = "";
+      clearSearchBtn.classList.remove("visible");
+      renderEmployees();
+      searchInput.focus();
+    });
+
+    filterToggleBtn.addEventListener("click", () => {
+      setFilterOpen(!state.filterOpen);
+    });
+
+    unreadToggleBtn.addEventListener("click", () => {
+      state.showUnreadOnly = !state.showUnreadOnly;
+      unreadToggleBtn.setAttribute("aria-pressed", state.showUnreadOnly ? "true" : "false");
+      unreadToggleBtn.classList.toggle("active", state.showUnreadOnly);
+      renderEmployees();
+    });
+
+    clearFiltersBtn.addEventListener("click", () => {
+      state.activeDepts.clear();
+      renderDeptButtons();
+      renderEmployees();
+    });
+
+    // Keyboard: Escape closes filter panel
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && state.filterOpen) {
+        setFilterOpen(false);
+        filterToggleBtn.focus();
+      }
+    });
+
+    // Init
+    yearSpan.textContent = new Date().getFullYear();
+    renderDeptButtons();
+    renderEmployees();
+  </script>
+</body>
+</html>
