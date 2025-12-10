@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkSphere | Login</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <div class="login-wrapper">
+        <!-- Login Container -->
+        <div class="login-container active" id="loginContainer">
+            <div class="login-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>WorkSphere</h1>
+                        <p>Employee Management System</p>
+                    </div>
+                </div>
+                <h2 class="welcome-text">Welcome Back</h2>
+            </div>
+
+            <!-- Tabs -->
+            <div class="login-tabs">
+                <button class="login-tab active" id="employeeTab" onclick="switchTab('employee')">
+                    <i class="fas fa-user"></i> Employee
+                </button>
+                <button class="login-tab" id="adminTab" onclick="switchTab('admin')">
+                    <i class="fas fa-user-shield"></i> Admin
+                </button>
+            </div>
+
+            <!-- Employee Login Form -->
+            <form id="employeeForm" class="login-form active">
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="employeeEmail" placeholder="Enter your email" required>
+                    </div>
+                    <div class="error-message" id="employeeEmailError"></div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="employeePassword" placeholder="Enter your password" required>
+                        <button type="button" class="show-password" onclick="togglePassword('employeePassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="employeePasswordError"></div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-login" id="employeeLoginBtn">
+                    <span class="btn-text">Login as Employee</span>
+                    <span class="btn-loading">
+                        <i class="fas fa-spinner fa-spin"></i> Authenticating...
+                    </span>
+                </button>
+            </form>
+
+            <!-- Admin Login Form -->
+            <form id="adminForm" class="login-form">
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="adminEmail" placeholder="Enter admin email" required>
+                    </div>
+                    <div class="error-message" id="adminEmailError"></div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="adminPassword" placeholder="Enter admin password" required>
+                        <button type="button" class="show-password" onclick="togglePassword('adminPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="adminPasswordError"></div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-login" id="adminLoginBtn">
+                    <span class="btn-text">Login as Admin</span>
+                    <span class="btn-loading">
+                        <i class="fas fa-spinner fa-spin"></i> Authenticating...
+                    </span>
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <div class="signup-link">
+                    <span>New to WorkSphere?</span>
+                    <a href="#" id="showSignup" onclick="showSignup()">Create Account</a>
+                </div>
+                <div class="demo-credentials">
+                    <details>
+                        <summary><i class="fas fa-info-circle"></i> Demo Credentials</summary>
+                        <div class="demo-info">
+                            <div class="demo-account">
+                                <strong>Employee:</strong> employee@worksphere.com / demo123
+                            </div>
+                            <div class="demo-account">
+                                <strong>Admin:</strong> admin@worksphere.com / admin123
+                            </div>
+                            <p class="demo-note">Or use any email to create a new account</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signup Container -->
+        <div class="signup-container" id="signupContainer">
+            <div class="signup-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Create Account</h1>
+                        <p>Join WorkSphere Team</p>
+                    </div>
+                </div>
+                <h2 class="welcome-text">Get Started</h2>
+            </div>
+
+            <form id="signupForm">
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="signupName" placeholder="Full Name" required>
+                    </div>
+                    <div class="error-message" id="signupNameError"></div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="signupEmail" placeholder="Email Address" required>
+                    </div>
+                    <div class="error-message" id="signupEmailError"></div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="signupPassword" placeholder="Create Password (min. 6 chars)" required>
+                        <button type="button" class="show-password" onclick="togglePassword('signupPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="signupPasswordError"></div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="signupConfirmPassword" placeholder="Confirm Password" required>
+                        <button type="button" class="show-password" onclick="togglePassword('signupConfirmPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="signupConfirmPasswordError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="image-upload-label">
+                        <input type="file" id="profileImage" accept="image/*" class="image-upload-input">
+                        <div class="image-upload-area">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Upload Profile Picture (Optional)</span>
+                            <p class="image-hint">PNG, JPG, GIF up to 5MB</p>
+                        </div>
+                    </label>
+                    <div class="image-preview" id="imagePreview"></div>
+                </div>
+
+                <div class="terms-agreement">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="agreeTerms" required>
+                        <span class="checkmark"></span>
+                        I agree to the <a href="#" class="terms-link">Terms of Service</a> and <a href="#" class="terms-link">Privacy Policy</a>
+                    </label>
+                    <div class="error-message" id="termsError"></div>
+                </div>
+
+                <button type="submit" class="btn btn-success btn-block btn-signup" id="signupBtn">
+                    <span class="btn-text">Create Account</span>
+                    <span class="btn-loading">
+                        <i class="fas fa-spinner fa-spin"></i> Creating Account...
+                    </span>
+                </button>
+            </form>
+
+            <div class="signup-footer">
+                <div class="login-link">
+                    <span>Already have an account?</span>
+                    <a href="#" id="showLogin" onclick="showLogin()">Sign In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-notification" id="toastNotification">
+        <div class="toast-content">
+            <i class="fas fa-check-circle toast-icon"></i>
+            <div class="toast-message" id="toastMessage">Success!</div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="login.js"></script>
+</body>
+</html>

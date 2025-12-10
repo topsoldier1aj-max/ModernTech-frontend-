@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkSphere | Employee Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="admin-dashboard.css">
+    <title>Modern Tech Solutions</title>
+    <script src="admin-dashboard.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="header-left">
+                <a href="#" class="logo">
+                    <i class="fas fa-users"></i>
+                    <div class="logo-text">
+                        <span class="logo-primary">WorkSphere</span>
+                        <span class="logo-subtitle">HR Management</span>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="header-right">
+                <div class="user-profile" id="userProfile">
+                    <div class="user-avatar">AU</div>
+                    <div class="user-info">
+                        <span class="user-name">Admin User</span>
+                        <span class="user-role">HR Manager</span>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Dashboard Overview -->
+        <section class="dashboard-overview">
+            <div class="dashboard-header">
+                <div>
+                    <h1 class="dashboard-title">Employee Directory</h1>
+                    <p class="dashboard-subtitle">Manage your team, track attendance, and handle leave requests</p>
+                </div>
+                <div class="dashboard-date" id="currentDate">
+                    <i class="fas fa-calendar"></i>
+                    <span>Loading date...</span>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="totalEmployees">10</div>
+                        <div class="stat-label">Total Employees</div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>25% from last year</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="activeNow">8</div>
+                        <div class="stat-label">Active Today</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-clock"></i>
+                            <span>80% attendance rate</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-umbrella-beach"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="onLeave">2</div>
+                        <div class="stat-label">On Leave</div>
+                        <div class="stat-trend warning">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>5 pending approvals</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="totalSalary">R 632,350</div>
+                        <div class="stat-label">Monthly Payroll</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-chart-line"></i>
+                            <span>This month total</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions & Search -->
+        <section class="action-section">
+            <div class="action-container">
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" 
+                               class="search-input" 
+                               placeholder="Search employees by name, department, or position..."
+                               id="searchInput">
+                        <button class="clear-btn" id="clearBtn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <div class="search-actions">
+                            <button class="btn btn-primary" id="searchBtn">
+                                <i class="fas fa-search"></i>
+                                <span>Search</span>
+                            </button>
+                            <button class="btn btn-outline" id="filterBtn">
+                                <i class="fas fa-sliders-h"></i>
+                                <span>Filters</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="addEmployeeBtn">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Add Employee</span>
+                    </button>
+                    <button class="btn btn-success" id="requestLeaveBtn">
+                        <i class="fas fa-calendar-plus"></i>
+                        <span>Request Leave</span>
+                    </button>
+                    <button class="btn btn-outline" id="viewPayrollBtn">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        <span>View Payroll</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Department Filters -->
+            <div class="filters-panel" id="filtersPanel">
+                <div class="filters-header">
+                    <h3>Filter by Department</h3>
+                    <button class="btn btn-text" id="resetFiltersBtn">
+                        <i class="fas fa-redo"></i>
+                        Reset All
+                    </button>
+                </div>
+                <div class="filters-grid">
+                    <button class="filter-chip active" data-dept="all">
+                        All Departments
+                        <span class="filter-count">10</span>
+                    </button>
+                    <button class="filter-chip" data-dept="development">
+                        <i class="fas fa-code"></i>
+                        Development
+                        <span class="filter-count">2</span>
+                    </button>
+                    <button class="filter-chip" data-dept="hr">
+                        <i class="fas fa-users"></i>
+                        HR
+                        <span class="filter-count">1</span>
+                    </button>
+                    <button class="filter-chip" data-dept="qa">
+                        <i class="fas fa-check-circle"></i>
+                        QA
+                        <span class="filter-count">1</span>
+                    </button>
+                    <button class="filter-chip" data-dept="sales">
+                        <i class="fas fa-chart-line"></i>
+                        Sales
+                        <span class="filter-count">1</span>
+                    </button>
+                    <button class="filter-chip" data-dept="marketing">
+                        <i class="fas fa-bullhorn"></i>
+                        Marketing
+                        <span class="filter-count">2</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content Area -->
+        <div class="content-area">
+            <!-- Employees Section -->
+            <section class="employees-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h2>Team Members</h2>
+                        <div class="section-subtitle">
+                            <span id="resultsCount">10</span> employees found
+                        </div>
+                    </div>
+                    <div class="section-actions">
+                        <select class="sort-select" id="sortSelect">
+                            <option value="name-asc">Sort by: Name A-Z</option>
+                            <option value="name-desc">Name Z-A</option>
+                            <option value="dept-asc">Department A-Z</option>
+                            <option value="dept-desc">Department Z-A</option>
+                            <option value="salary-high">Salary (High to Low)</option>
+                            <option value="salary-low">Salary (Low to High)</option>
+                        </select>
+                        <div class="view-toggle">
+                            <button class="view-btn active" data-view="grid">
+                                <i class="fas fa-th-large"></i>
+                            </button>
+                            <button class="view-btn" data-view="list">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="employees-grid" id="employeeList">
+                    <!-- Employee cards will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Leave Requests & Analytics Sidebar -->
+            <aside class="sidebar">
+                <!-- Leave Requests -->
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <h3>
+                            <i class="fas fa-calendar-alt"></i>
+                            Leave Requests
+                        </h3>
+                        <button class="btn btn-text" id="viewAllLeaveBtn">
+                            View All
+                        </button>
+                    </div>
+                    <div class="leave-requests" id="leaveRequestsList">
+                        <!-- Leave requests will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Payroll Summary -->
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <h3>
+                            <i class="fas fa-file-invoice-dollar"></i>
+                            Payroll Summary
+                        </h3>
+                    </div>
+                    <div class="payroll-summary" id="payrollSummary">
+                        <!-- Payroll summary will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Upcoming Holidays -->
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <h3>
+                            <i class="fas fa-calendar-star"></i>
+                            Recent Attendance
+                        </h3>
+                    </div>
+                    <div class="holidays-list" id="recentAttendance">
+                        <!-- Recent attendance will be populated by JavaScript -->
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="footer-container">
+            <div class="footer-left">
+                <div class="footer-logo">
+                    <i class="fas fa-users"></i>
+                    <span>WorkSphere</span>
+                </div>
+                <p class="footer-description">
+                    Professional Employee Management System
+                </p>
+            </div>
+            <div class="footer-right">
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Privacy Policy</a>
+                    <a href="#" class="footer-link">Terms of Service</a>
+                    <a href="#" class="footer-link">Help Center</a>
+                    <a href="#" class="footer-link">Contact Support</a>
+                </div>
+                <div class="footer-copyright">
+                    <i class="far fa-copyright"></i>
+                    2024 WorkSphere. All rights reserved. v2.0
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Add Employee Modal -->
+    <div class="modal-overlay" id="addEmployeeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">Add New Employee</h2>
+                    <p class="modal-subtitle">Fill in the details below to add a new team member</p>
+                </div>
+                <button class="modal-close" onclick="closeModal('addEmployeeModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addEmployeeForm">
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-user"></i>
+                            Personal Information
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label required">
+                                    <i class="fas fa-user"></i>
+                                    Full Name
+                                </label>
+                                <input type="text" class="form-input" id="fullName" required>
+                                <div class="form-error" id="fullNameError">Full name is required</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">
+                                    <i class="fas fa-envelope"></i>
+                                    Email Address
+                                </label>
+                                <input type="email" class="form-input" id="email" required>
+                                <div class="form-error" id="emailError">Valid email is required</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-phone"></i>
+                                    Phone Number
+                                </label>
+                                <input type="tel" class="form-input" id="phone">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-briefcase"></i>
+                            Employment Details
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label required">
+                                    <i class="fas fa-user-tie"></i>
+                                    Position
+                                </label>
+                                <input type="text" class="form-input" id="position" required>
+                                <div class="form-error" id="positionError">Position is required</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">
+                                    <i class="fas fa-building"></i>
+                                    Department
+                                </label>
+                                <select class="form-select" id="department" required>
+                                    <option value="">Select Department</option>
+                                    <option value="Development">Development</option>
+                                    <option value="HR">HR</option>
+                                    <option value="QA">QA</option>
+                                    <option value="Sales">Sales</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="Design">Design</option>
+                                    <option value="IT">IT</option>
+                                    <option value="Finance">Finance</option>
+                                    <option value="Support">Support</option>
+                                </select>
+                                <div class="form-error" id="departmentError">Department is required</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    Salary (R)
+                                </label>
+                                <input type="number" class="form-input" id="salary" min="0" required>
+                                <div class="form-error" id="salaryError">Salary is required</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    Employment History
+                                </label>
+                                <textarea class="form-textarea" id="employmentHistory" placeholder="e.g., Joined in 2020, promoted in 2022"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('addEmployeeModal')">
+                    Cancel
+                </button>
+                <button class="btn btn-primary" onclick="addNewEmployee()">
+                    <i class="fas fa-user-plus"></i>
+                    Add Employee
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Request Leave Modal -->
+    <div class="modal-overlay" id="requestLeaveModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">Request Leave</h2>
+                    <p class="modal-subtitle">Submit a new leave request for yourself or team members</p>
+                </div>
+                <button class="modal-close" onclick="closeModal('requestLeaveModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="requestLeaveForm">
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-calendar-alt"></i>
+                            Leave Details
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label required">
+                                    <i class="fas fa-user"></i>
+                                    Employee
+                                </label>
+                                <select class="form-select" id="leaveEmployee" required>
+                                    <option value="">Select Employee</option>
+                                </select>
+                                <div class="form-error" id="leaveEmployeeError">Employee is required</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">
+                                    <i class="fas fa-umbrella-beach"></i>
+                                    Leave Type
+                                </label>
+                                <select class="form-select" id="leaveType" required>
+                                    <option value="">Select Type</option>
+                                    <option value="sick">Sick Leave</option>
+                                    <option value="vacation">Vacation</option>
+                                    <option value="personal">Personal</option>
+                                    <option value="family">Family Responsibility</option>
+                                    <option value="medical">Medical Appointment</option>
+                                    <option value="bereavement">Bereavement</option>
+                                    <option value="childcare">Childcare</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <div class="form-error" id="leaveTypeError">Leave type is required</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">
+                                    <i class="fas fa-calendar-day"></i>
+                                    Date
+                                </label>
+                                <input type="date" class="form-input" id="leaveDate" required>
+                                <div class="form-error" id="leaveDateError">Date is required</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label required">
+                                <i class="fas fa-comment"></i>
+                                Reason for Leave
+                            </label>
+                            <textarea class="form-textarea" id="leaveReason" placeholder="Please provide details about your leave request..." required></textarea>
+                            <div class="form-error" id="leaveReasonError">Reason is required</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('requestLeaveModal')">
+                    Cancel
+                </button>
+                <button class="btn btn-success" onclick="submitLeaveRequest()">
+                    <i class="fas fa-paper-plane"></i>
+                    Submit Request
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Payroll Modal -->
+    <div class="modal-overlay" id="viewPayrollModal">
+        <div class="modal" style="max-width: 800px;">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">Monthly Payroll</h2>
+                    <p class="modal-subtitle">July 2024 Payroll Summary</p>
+                </div>
+                <button class="modal-close" onclick="closeModal('viewPayrollModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="payrollDetails">
+                    <!-- Payroll details will be populated by JavaScript -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('viewPayrollModal')">
+                    Close
+                </button>
+                <button class="btn btn-primary" onclick="exportPayroll()">
+                    <i class="fas fa-download"></i>
+                    Export to PDF
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    
+</body>
+</html>

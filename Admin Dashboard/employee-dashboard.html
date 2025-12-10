@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkSphere | Employee Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="employee-dashboard.css">
+    <script src="employee-dashboard.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="header-left">
+                <a href="#" class="logo">
+                    <i class="fas fa-users"></i>
+                    <div class="logo-text">
+                        <span class="logo-primary">WorkSphere</span>
+                        <span class="logo-subtitle">Employee Portal</span>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="header-right">
+                <div class="user-profile" id="userProfile">
+                    <div class="user-avatar" id="userAvatar">JS</div>
+                    <div class="user-info">
+                        <span class="user-name" id="userName">John Smith</span>
+                        <span class="user-role" id="userRole">Software Developer</span>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+            <div class="welcome-header">
+                <div>
+                    <h1 class="welcome-title">Welcome back, <span id="welcomeName">John</span>!</h1>
+                    <p class="welcome-subtitle">Here's your dashboard with important updates and quick actions</p>
+                </div>
+                <div class="welcome-date" id="currentDate">
+                    <i class="fas fa-calendar"></i>
+                    <span>Loading date...</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Stats -->
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="daysPresent">21</div>
+                        <div class="stat-label">Days Present This Month</div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>95% attendance</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-umbrella-beach"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="leaveBalance">12</div>
+                        <div class="stat-label">Leave Days Remaining</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-clock"></i>
+                            <span>Reset in 45 days</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="monthlySalary">R 65,000</div>
+                        <div class="stat-label">This Month's Salary</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-calendar"></i>
+                            <span>Next pay: 5 days</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="hoursWorked">168</div>
+                        <div class="stat-label">Hours This Month</div>
+                        <div class="stat-trend warning">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>2 hours overtime</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="actions-section">
+            <div class="section-header">
+                <h2>Quick Actions</h2>
+                <p>Common tasks you can perform quickly</p>
+            </div>
+            <div class="actions-grid">
+                <button class="action-btn" id="requestLeaveBtn">
+                    <i class="fas fa-calendar-plus"></i>
+                    <span>Request Leave</span>
+                </button>
+                <button class="action-btn" id="viewPayslipBtn">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>View Payslip</span>
+                </button>
+                <button class="action-btn" id="updateProfileBtn">
+                    <i class="fas fa-user-edit"></i>
+                    <span>Update Profile</span>
+                </button>
+                <button class="action-btn" id="viewScheduleBtn">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>View Schedule</span>
+                </button>
+                <button class="action-btn" id="reportIssueBtn">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Report Issue</span>
+                </button>
+                <button class="action-btn" id="companyDirectoryBtn">
+                    <i class="fas fa-address-book"></i>
+                    <span>Company Directory</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Main Content Area -->
+        <div class="content-area">
+            <!-- Left Column -->
+            <section class="main-content">
+                <!-- Upcoming Leave -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3>
+                            <i class="fas fa-calendar-alt"></i>
+                            Upcoming Leave
+                        </h3>
+                        <button class="btn btn-text" id="viewAllLeaveBtn">
+                            View All
+                        </button>
+                    </div>
+                    <div class="leave-list" id="upcomingLeave">
+                        <div class="no-leave">
+                            <i class="fas fa-umbrella-beach"></i>
+                            <p>No upcoming leave scheduled</p>
+                            <button class="btn btn-outline btn-sm" id="scheduleLeaveBtn">
+                                Schedule Leave
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3>
+                            <i class="fas fa-history"></i>
+                            Recent Activity
+                        </h3>
+                    </div>
+                    <div class="activity-list" id="recentActivity">
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-clock text-success"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">Clock-in at 08:30 AM</div>
+                                <div class="activity-time">Today, 2 hours ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-file-alt text-primary"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">Submitted monthly report</div>
+                                <div class="activity-time">Yesterday, 4:30 PM</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-check-circle text-success"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">Completed project milestone</div>
+                                <div class="activity-time">2 days ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Sidebar -->
+            <aside class="sidebar">
+                <!-- Team Members -->
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <h3>
+                            <i class="fas fa-users"></i>
+                            Team Members
+                        </h3>
+                    </div>
+                    <div class="team-list">
+                        <div class="team-member">
+                            <div class="member-avatar">SJ</div>
+                            <div class="member-info">
+                                <div class="member-name">Sarah Johnson</div>
+                                <div class="member-role">Team Lead</div>
+                            </div>
+                            <div class="member-status online"></div>
+                        </div>
+                        <div class="team-member">
+                            <div class="member-avatar">MW</div>
+                            <div class="member-info">
+                                <div class="member-name">Mike Wilson</div>
+                                <div class="member-role">Senior Developer</div>
+                            </div>
+                            <div class="member-status online"></div>
+                        </div>
+                        <div class="team-member">
+                            <div class="member-avatar">EA</div>
+                            <div class="member-info">
+                                <div class="member-name">Emma Anderson</div>
+                                <div class="member-role">UI/UX Designer</div>
+                            </div>
+                            <div class="member-status away"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Important Dates -->
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <h3>
+                            <i class="fas fa-calendar-star"></i>
+                            Important Dates
+                        </h3>
+                    </div>
+                    <div class="dates-list">
+                        <div class="date-item">
+                            <div class="date-icon">
+                                <i class="fas fa-birthday-cake text-warning"></i>
+                            </div>
+                            <div class="date-details">
+                                <div class="date-title">Team Birthday Lunch</div>
+                                <div class="date-time">Tomorrow, 12:30 PM</div>
+                            </div>
+                        </div>
+                        <div class="date-item">
+                            <div class="date-icon">
+                                <i class="fas fa-chart-line text-info"></i>
+                            </div>
+                            <div class="date-details">
+                                <div class="date-title">Quarterly Review</div>
+                                <div class="date-time">Next Monday, 10:00 AM</div>
+                            </div>
+                        </div>
+                        <div class="date-item">
+                            <div class="date-icon">
+                                <i class="fas fa-gift text-success"></i>
+                            </div>
+                            <div class="date-details">
+                                <div class="date-title">Company Anniversary</div>
+                                <div class="date-time">15th December</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <h3>
+                            <i class="fas fa-link"></i>
+                            Quick Links
+                        </h3>
+                    </div>
+                    <div class="links-list">
+                        <a href="#" class="quick-link">
+                            <i class="fas fa-book"></i>
+                            <span>Employee Handbook</span>
+                        </a>
+                        <a href="#" class="quick-link">
+                            <i class="fas fa-download"></i>
+                            <span>Download Forms</span>
+                        </a>
+                        <a href="#" class="quick-link">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Help Center</span>
+                        </a>
+                        <a href="#" class="quick-link">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Performance Dashboard</span>
+                        </a>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="footer-container">
+            <div class="footer-left">
+                <div class="footer-logo">
+                    <i class="fas fa-users"></i>
+                    <span>WorkSphere</span>
+                </div>
+                <p class="footer-description">
+                    Employee Management Portal v2.0
+                </p>
+            </div>
+            <div class="footer-right">
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Privacy Policy</a>
+                    <a href="#" class="footer-link">Terms of Service</a>
+                    <a href="#" class="footer-link">IT Support</a>
+                    <a href="#" class="footer-link">HR Contact</a>
+                </div>
+                <div class="footer-copyright">
+                    <i class="far fa-copyright"></i>
+                    2024 WorkSphere. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Leave Request Modal -->
+    <div class="modal-overlay" id="leaveRequestModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">Request Leave</h2>
+                    <p class="modal-subtitle">Submit a leave request for approval</p>
+                </div>
+                <button class="modal-close" id="closeLeaveModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="leaveRequestForm">
+                    <div class="form-group">
+                        <label class="form-label required">
+                            <i class="fas fa-umbrella-beach"></i>
+                            Leave Type
+                        </label>
+                        <select class="form-select" id="leaveType" required>
+                            <option value="">Select Type</option>
+                            <option value="vacation">Vacation Leave</option>
+                            <option value="sick">Sick Leave</option>
+                            <option value="personal">Personal Leave</option>
+                            <option value="family">Family Responsibility</option>
+                            <option value="medical">Medical Appointment</option>
+                        </select>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label required">
+                                <i class="fas fa-calendar-day"></i>
+                                Start Date
+                            </label>
+                            <input type="date" class="form-input" id="startDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">
+                                <i class="fas fa-calendar-day"></i>
+                                End Date
+                            </label>
+                            <input type="date" class="form-input" id="endDate" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-clock"></i>
+                            Number of Days
+                        </label>
+                        <input type="number" class="form-input" id="daysCount" min="0.5" max="30" step="0.5" value="1" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">
+                            <i class="fas fa-comment"></i>
+                            Reason for Leave
+                        </label>
+                        <textarea class="form-textarea" id="leaveReason" placeholder="Please provide details about your leave request..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-paperclip"></i>
+                            Attach Documents (Optional)
+                        </label>
+                        <input type="file" class="form-input" id="leaveDocuments" multiple>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelLeaveBtn">
+                    Cancel
+                </button>
+                <button class="btn btn-success" id="submitLeaveBtn">
+                    <i class="fas fa-paper-plane"></i>
+                    Submit Request
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Update Modal -->
+    <div class="modal-overlay" id="profileUpdateModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">Update Profile</h2>
+                    <p class="modal-subtitle">Update your personal information</p>
+                </div>
+                <button class="modal-close" id="closeProfileModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="profileUpdateForm">
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-user"></i>
+                            Personal Information
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label required">
+                                    <i class="fas fa-user"></i>
+                                    Full Name
+                                </label>
+                                <input type="text" class="form-input" id="fullName" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">
+                                    <i class="fas fa-envelope"></i>
+                                    Email Address
+                                </label>
+                                <input type="email" class="form-input" id="profileEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-phone"></i>
+                                    Phone Number
+                                </label>
+                                <input type="tel" class="form-input" id="phoneNumber">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-home"></i>
+                            Contact Details
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    Address
+                                </label>
+                                <input type="text" class="form-input" id="address" placeholder="Street address">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-city"></i>
+                                    City
+                                </label>
+                                <input type="text" class="form-input" id="city">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-lock"></i>
+                            Security
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-key"></i>
+                                Change Password
+                            </label>
+                            <input type="password" class="form-input" id="newPassword" placeholder="Leave blank to keep current">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-key"></i>
+                                Confirm New Password
+                            </label>
+                            <input type="password" class="form-input" id="confirmPassword" placeholder="Confirm new password">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelProfileBtn">
+                    Cancel
+                </button>
+                <button class="btn btn-primary" id="saveProfileBtn">
+                    <i class="fas fa-save"></i>
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
