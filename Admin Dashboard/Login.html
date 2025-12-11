@@ -223,5 +223,20 @@
 
     <!-- Scripts -->
     <script src="login.js"></script>
+    <!-- Simple Logout Button -->
+<div style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+    <button onclick="logout()" style="padding: 10px 15px; background: #ef4444; color: white; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+        <i class="fas fa-sign-out-alt"></i>
+        Logout
+    </button>
+</div>
+
+<script>
+    // Simple logout function
+    function logout() {
+        localStorage.removeItem('workSphereSession');
+        window.location.href = 'Login.html';
+    }
+</script>
 </body>
 </html>

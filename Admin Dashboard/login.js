@@ -31,15 +31,9 @@ function checkExistingSession() {
         const hoursDiff = (currentTime - loginTime) / (1000 * 60 * 60);
         
         if (hoursDiff < 24) {
-            // Auto-redirect based on role
-            showNotification(`Welcome back, ${user.name}! Redirecting...`, 'success');
-            setTimeout(() => {
-                if (user.role === 'admin') {
-                    window.location.href = 'Admin Dashboard.html';
-                } else {
-                    window.location.href = 'Employee Dashboard.html';
-                }
-            }, 1000);
+            // DON'T auto-redirect - let user choose where to go
+            console.log('Session valid, but not auto-redirecting');
+            showNotification(`Welcome back, ${user.name}! You can login again or continue to dashboard.`, 'info');
         } else {
             // Session expired
             localStorage.removeItem('workSphereSession');
