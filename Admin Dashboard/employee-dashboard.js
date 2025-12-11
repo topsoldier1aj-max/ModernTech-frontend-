@@ -1,27 +1,41 @@
-// employee-dashboard.js - COMPLETE VERSION WITH LINKING
+// employee-dashboard.js - UPDATED TO USE JSON DATA
 
 console.log('Employee dashboard script loaded');
 
-// Authentication check - RUNS FIRST
+// Authentication check
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Employee dashboard initializing...');
     
-    // Check authentication using global Auth object from login.js
-    if (!window.Auth || !window.Auth.requireAuth('employee')) {
+    // Check if user is logged in
+    const sessionData = localStorage.getItem('workSphereSession');
+    
+    if (!sessionData) {
+        console.log('No session found, redirecting to login...');
+        window.location.href = 'Login.html';
         return;
     }
     
-    // Get current user
-    const user = window.Auth.getCurrentUser();
-    if (!user) return;
-    
-    console.log('User authenticated:', user.name);
-    
-    // Update UI with user info
-    updateUserInfo(user);
-    
-    // Initialize the dashboard
-    initializeEmployeeDashboard(user);
+    try {
+        const user = JSON.parse(sessionData);
+        console.log('User authenticated:', user.name);
+        
+        // Check if user is an employee (not admin)
+        if (user.role === 'admin') {
+            console.log('Admin user, redirecting to admin dashboard...');
+            window.location.href = 'Admin Dashboard.html';
+            return;
+        }
+        
+        // Update UI with user info
+        updateUserInfo(user);
+        
+        // Initialize the dashboard with JSON data
+        initializeEmployeeDashboard(user);
+        
+    } catch (error) {
+        console.error('Error parsing session data:', error);
+        window.location.href = 'Login.html';
+    }
 });
 
 function updateUserInfo(user) {
@@ -52,26 +66,65 @@ function updateUserInfo(user) {
     window.currentUser = user;
 }
 
-function initializeEmployeeDashboard(user) {
+async function initializeEmployeeDashboard(user) {
     console.log('Initializing dashboard for user:', user.name);
     
     // Set current date
     updateCurrentDate();
     
-    // Initialize stats with demo data
-    initStats();
+    // Load JSON data
+    try {
+        await loadJSONData();
+        
+        // Initialize stats with data for current user
+        initStats(user);
+        
+        // Initialize modals
+        initModals();
+        
+        // Set up event listeners
+        setupEventListeners();
+        
+        // Setup logout functionality
+        setupLogout();
+        
+        // Show welcome notification
+        showNotification(`Welcome back, ${user.name}!`, 'success');
+        
+    } catch (error) {
+        console.error('Error loading data:', error);
+        showNotification('Error loading data. Using demo data.', 'error');
+        // Fall back to existing dummy data
+        initStats(user);
+        initModals();
+        setupEventListeners();
+        setupLogout();
+    }
+}
+
+async function loadJSONData() {
+    // Load employee information
+    const employeeResponse = await fetch('employee_info.json');
+    if (!employeeResponse.ok) {
+        throw new Error('Failed to load employee data');
+    }
+    window.employeeInfo = await employeeResponse.json();
     
-    // Initialize modals
-    initModals();
+    // Load attendance data
+    const attendanceResponse = await fetch('attendance.json');
+    if (!attendanceResponse.ok) {
+        throw new Error('Failed to load attendance data');
+    }
+    window.attendanceData = await attendanceResponse.json();
     
-    // Set up event listeners
-    setupEventListeners();
+    // Load payroll data
+    const payrollResponse = await fetch('payroll_data.json');
+    if (!payrollResponse.ok) {
+        throw new Error('Failed to load payroll data');
+    }
+    window.payrollData = await payrollResponse.json();
     
-    // Setup logout functionality
-    setupLogout();
-    
-    // Show welcome notification
-    showNotification(`Welcome back, ${user.name}!`, 'success');
+    console.log('All JSON data loaded successfully for employee dashboard');
 }
 
 function updateCurrentDate() {
@@ -86,13 +139,68 @@ function updateCurrentDate() {
     }
 }
 
-function initStats() {
-    // Demo data - in a real app, this would come from an API
+function initStats(user) {
+    // Find current user in JSON data
+    let userData = null;
+    let attendanceInfo = null;
+    let payrollInfo = null;
+    
+    if (window.employeeInfo && window.employeeInfo.employeeInformation) {
+        // Try to find by email or name
+        userData = window.employeeInfo.employeeInformation.find(emp => 
+            emp.contact === user.email || emp.name === user.name
+        );
+    }
+    
+    if (userData && window.attendanceData && window.attendanceData.attendanceAndLeave) {
+        attendanceInfo = window.attendanceData.attendanceAndLeave.find(att => 
+            att.employeeId === userData.employeeId
+        );
+    }
+    
+    if (userData && window.payrollData && window.payrollData.payrollData) {
+        payrollInfo = window.payrollData.payrollData.find(pay => 
+            pay.employeeId === userData.employeeId
+        );
+    }
+    
+    // Calculate stats based on JSON data
+    let daysPresent = 21;
+    let leaveBalance = 12;
+    let monthlySalary = 'R 65,000';
+    let hoursWorked = 168;
+    
+    if (attendanceInfo) {
+        // Calculate days present this month
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
+        const daysThisMonth = attendanceInfo.attendance.filter(att => {
+            const date = new Date(att.date);
+            return date.getMonth() === currentMonth && 
+                   date.getFullYear() === currentYear && 
+                   att.status === 'Present';
+        }).length;
+        daysPresent = daysThisMonth;
+        
+        // Calculate leave balance (simplified)
+        const usedLeave = attendanceInfo.leaveRequests ? 
+            attendanceInfo.leaveRequests.filter(req => req.status === 'Approved').length : 0;
+        leaveBalance = Math.max(0, 15 - usedLeave); // Assuming 15 days annual leave
+    }
+    
+    if (payrollInfo) {
+        monthlySalary = `R ${payrollInfo.finalSalary.toLocaleString()}`;
+        hoursWorked = payrollInfo.hoursWorked;
+    } else if (userData) {
+        monthlySalary = `R ${userData.salary.toLocaleString()}`;
+    }
+    
+    // Update UI with calculated stats
     const stats = {
-        daysPresent: 21,
-        leaveBalance: 12,
-        monthlySalary: 'R 65,000',
-        hoursWorked: 168
+        daysPresent: daysPresent,
+        leaveBalance: leaveBalance,
+        monthlySalary: monthlySalary,
+        hoursWorked: hoursWorked
     };
     
     Object.keys(stats).forEach(key => {
@@ -295,10 +403,33 @@ function submitLeaveRequest() {
         return;
     }
     
+    // Get current user from session
+    const sessionData = localStorage.getItem('workSphereSession');
+    if (!sessionData) {
+        showNotification('Session expired. Please login again.', 'error');
+        window.location.href = 'Login.html';
+        return;
+    }
+    
+    const user = JSON.parse(sessionData);
+    
+    // Find user in employee data
+    let userData = null;
+    if (window.employeeInfo && window.employeeInfo.employeeInformation) {
+        userData = window.employeeInfo.employeeInformation.find(emp => 
+            emp.contact === user.email || emp.name === user.name
+        );
+    }
+    
+    if (!userData) {
+        showNotification('User data not found.', 'error');
+        return;
+    }
+    
     // Simulate API call
     console.log('Leave Request Submitted:', {
-        employeeId: window.currentUser?.id,
-        employeeName: window.currentUser?.name,
+        employeeId: userData.employeeId,
+        employeeName: userData.name,
         leaveType,
         startDate,
         endDate,
@@ -345,7 +476,7 @@ function saveProfileChanges() {
     
     // Get stored users
     const storedUsers = JSON.parse(localStorage.getItem('workSphereUsers') || '[]');
-    const currentUserData = window.Auth.getCurrentUser();
+    const currentUserData = window.currentUser;
     
     // Update user in stored users
     const userIndex = storedUsers.findIndex(user => user.id === currentUserData?.id);
@@ -357,17 +488,21 @@ function saveProfileChanges() {
     }
     
     // Update user session data
-    let userData = JSON.parse(localStorage.getItem('workSphereUser') || '{}');
+    let userData = JSON.parse(localStorage.getItem('workSphereSession') || '{}');
     
     userData.name = fullName;
     userData.email = email;
     if (phone) userData.phone = phone;
     if (newPassword) {
         // In a real app, you would hash the password
-        userData.password = newPassword;
+        // Update in stored users
+        if (userIndex !== -1) {
+            storedUsers[userIndex].password = newPassword;
+            localStorage.setItem('workSphereUsers', JSON.stringify(storedUsers));
+        }
     }
     
-    localStorage.setItem('workSphereUser', JSON.stringify(userData));
+    localStorage.setItem('workSphereSession', JSON.stringify(userData));
     
     // Update current user reference
     window.currentUser = userData;
@@ -379,8 +514,10 @@ function saveProfileChanges() {
     closeModal('profileUpdateModal');
     
     // Reset password fields
-    document.getElementById('newPassword').value = '';
-    document.getElementById('confirmPassword').value = '';
+    const newPasswordInput = document.getElementById('newPassword');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+    if (newPasswordInput) newPasswordInput.value = '';
+    if (confirmPasswordInput) confirmPasswordInput.value = '';
 }
 
 function setupLogout() {
@@ -440,12 +577,8 @@ function setupLogout() {
             logoutBtn.onmouseleave = () => logoutBtn.style.background = '#ef4444';
             
             logoutBtn.onclick = function() {
-                if (window.Auth && window.Auth.logout) {
-                    window.Auth.logout();
-                } else {
-                    localStorage.removeItem('workSphereUser');
-                    window.location.href = 'Login.html';
-                }
+                localStorage.removeItem('workSphereSession');
+                window.location.href = 'Login.html';
             };
             
             logoutMenu.appendChild(logoutBtn);
@@ -546,3 +679,4 @@ window.openModal = openModal;
 window.closeModal = closeModal;
 window.submitLeaveRequest = submitLeaveRequest;
 window.saveProfileChanges = saveProfileChanges;
+

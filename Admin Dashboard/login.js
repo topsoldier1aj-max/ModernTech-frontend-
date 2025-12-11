@@ -1,122 +1,160 @@
-// login.js - COMPLETE PROFESSIONAL VERSION
+// login.js - UPDATED FOR INTEGRATION
+
+console.log('WorkSphere Login System Loading...');
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('WorkSphere Login System Initializing...');
-    
-    // Show login modal immediately
-    const loginModal = document.getElementById('loginModal');
-    if (loginModal) {
-        loginModal.style.display = 'flex';
-        loginModal.classList.add('active');
-    }
-    
-    // Initialize the login system
-    initializeLoginSystem();
+    console.log('Login page initializing...');
     
     // Check for existing session
     checkExistingSession();
+    
+    // Initialize login system
+    initializeLoginSystem();
 });
 
+function checkExistingSession() {
+    const sessionData = localStorage.getItem('workSphereSession');
+    
+    if (!sessionData) {
+        console.log('No existing session found');
+        return;
+    }
+    
+    try {
+        const user = JSON.parse(sessionData);
+        console.log('Found existing session for:', user.name);
+        
+        // Check session expiration (24 hours)
+        const loginTime = new Date(user.loginTime);
+        const currentTime = new Date();
+        const hoursDiff = (currentTime - loginTime) / (1000 * 60 * 60);
+        
+        if (hoursDiff < 24) {
+            // Auto-redirect based on role
+            showNotification(`Welcome back, ${user.name}! Redirecting...`, 'success');
+            setTimeout(() => {
+                if (user.role === 'admin') {
+                    window.location.href = 'Admin Dashboard.html';
+                } else {
+                    window.location.href = 'Employee Dashboard.html';
+                }
+            }, 1000);
+        } else {
+            // Session expired
+            localStorage.removeItem('workSphereSession');
+            showNotification('Session expired. Please login again.', 'info');
+        }
+    } catch (error) {
+        console.error('Error parsing session:', error);
+        localStorage.removeItem('workSphereSession');
+    }
+}
+
 function initializeLoginSystem() {
-    console.log('Initializing login system...');
+    console.log('Setting up login system...');
     
     // Setup tab switching
     setupTabSwitching();
     
-    // Setup modal navigation
-    setupModalNavigation();
+    // Setup form submission
+    setupFormSubmission();
     
-    // Setup form handlers
-    setupFormHandlers();
+    // Setup show/hide password
+    setupPasswordToggle();
     
-    // Initialize demo users
+    // Setup image preview
+    setupImagePreview();
+    
+    // Initialize demo users if needed
     initializeDemoUsers();
     
-    // Setup image upload preview
-    setupImageUpload();
-    
-    console.log('Login system initialized successfully');
+    console.log('Login system ready');
 }
 
-// ===== TAB SWITCHING =====
 function setupTabSwitching() {
-    const tabs = document.querySelectorAll('.tab');
-    const forms = document.querySelectorAll('.login-form');
+    const employeeTab = document.getElementById('employeeTab');
+    const adminTab = document.getElementById('adminTab');
+    const employeeForm = document.getElementById('employeeForm');
+    const adminForm = document.getElementById('adminForm');
+    const showSignup = document.getElementById('showSignup');
+    const showLogin = document.getElementById('showLogin');
+    const loginContainer = document.getElementById('loginContainer');
+    const signupContainer = document.getElementById('signupContainer');
     
-    tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            // Get target form ID
-            const targetId = this.getAttribute('data-target');
-            
-            // Remove active class from all tabs
-            tabs.forEach(t => t.classList.remove('active'));
-            // Add active to clicked tab
-            this.classList.add('active');
-            
-            // Hide all forms
-            forms.forEach(f => f.classList.remove('active'));
-            // Show target form
-            document.getElementById(targetId).classList.add('active');
+    if (employeeTab && adminTab) {
+        employeeTab.addEventListener('click', function() {
+            switchTab('employee');
         });
-    });
-}
-
-// ===== MODAL NAVIGATION =====
-function setupModalNavigation() {
-    // Show signup modal
-    const showSignupBtn = document.getElementById('openSignup');
-    if (showSignupBtn) {
-        showSignupBtn.addEventListener('click', function(e) {
+        
+        adminTab.addEventListener('click', function() {
+            switchTab('admin');
+        });
+    }
+    
+    if (showSignup) {
+        showSignup.addEventListener('click', function(e) {
             e.preventDefault();
-            showModal('signupModal');
+            showSignupForm();
         });
     }
     
-    // Show login modal
-    const showLoginBtn = document.getElementById('backToLogin');
-    if (showLoginBtn) {
-        showLoginBtn.addEventListener('click', function(e) {
+    if (showLogin) {
+        showLogin.addEventListener('click', function(e) {
             e.preventDefault();
-            showModal('loginModal');
+            showLoginForm();
         });
     }
 }
 
-function showModal(modalId) {
-    // Hide all modals
-    const modals = document.querySelectorAll('.modal');
-    modals.forEach(modal => {
-        modal.style.display = 'none';
-        modal.classList.remove('active');
-    });
+function switchTab(tab) {
+    const employeeTab = document.getElementById('employeeTab');
+    const adminTab = document.getElementById('adminTab');
+    const employeeForm = document.getElementById('employeeForm');
+    const adminForm = document.getElementById('adminForm');
     
-    // Show selected modal
-    const targetModal = document.getElementById(modalId);
-    if (targetModal) {
-        targetModal.style.display = 'flex';
-        setTimeout(() => {
-            targetModal.classList.add('active');
-        }, 10);
+    if (tab === 'employee') {
+        employeeTab.classList.add('active');
+        adminTab.classList.remove('active');
+        employeeForm.classList.add('active');
+        adminForm.classList.remove('active');
+    } else {
+        adminTab.classList.add('active');
+        employeeTab.classList.remove('active');
+        adminForm.classList.add('active');
+        employeeForm.classList.remove('active');
     }
 }
 
-// ===== FORM HANDLERS =====
-function setupFormHandlers() {
-    // Employee login
-    const employeeForm = document.getElementById('employeeLogin');
+function showSignupForm() {
+    const loginContainer = document.getElementById('loginContainer');
+    const signupContainer = document.getElementById('signupContainer');
+    
+    if (loginContainer) loginContainer.classList.remove('active');
+    if (signupContainer) signupContainer.classList.add('active');
+}
+
+function showLoginForm() {
+    const loginContainer = document.getElementById('loginContainer');
+    const signupContainer = document.getElementById('signupContainer');
+    
+    if (signupContainer) signupContainer.classList.remove('active');
+    if (loginContainer) loginContainer.classList.add('active');
+}
+
+function setupFormSubmission() {
+    const employeeForm = document.getElementById('employeeForm');
+    const adminForm = document.getElementById('adminForm');
+    const signupForm = document.getElementById('signupForm');
+    
     if (employeeForm) {
         employeeForm.addEventListener('submit', handleEmployeeLogin);
     }
     
-    // Admin login
-    const adminForm = document.getElementById('adminLogin');
     if (adminForm) {
         adminForm.addEventListener('submit', handleAdminLogin);
     }
     
-    // Signup form
-    const signupForm = document.getElementById('signupForm');
     if (signupForm) {
         signupForm.addEventListener('submit', handleSignup);
     }
@@ -125,77 +163,125 @@ function setupFormHandlers() {
 async function handleEmployeeLogin(e) {
     e.preventDefault();
     
-    const emailInput = document.querySelector('#employeeLogin input[type="email"]');
-    const passwordInput = document.querySelector('#employeeLogin input[type="password"]');
+    const email = document.getElementById('employeeEmail').value.trim();
+    const password = document.getElementById('employeePassword').value;
     
-    const email = emailInput.value.trim();
-    const password = passwordInput.value;
-    
-    // Validate input
-    if (!validateFormInput(email, password, 'employee')) {
+    // Validate
+    if (!validateLoginForm(email, password, 'employee')) {
         return;
     }
     
-    // Show loading state
-    const submitBtn = document.getElementById('employeeSubmitBtn');
+    // Show loading
+    const submitBtn = document.querySelector('#employeeForm .btn-login');
     if (submitBtn) submitBtn.classList.add('loading');
     
     // Simulate API delay
-    await simulateDelay(1000);
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
     // Process login
-    processLogin(email, password, 'employee');
+    const success = await processLogin(email, password, 'employee');
     
-    // Remove loading state
+    // Hide loading
     if (submitBtn) submitBtn.classList.remove('loading');
+    
+    if (success) {
+        showNotification('Login successful! Redirecting...', 'success');
+        setTimeout(() => {
+            window.location.href = 'Employee Dashboard.html';
+        }, 1500);
+    }
 }
 
 async function handleAdminLogin(e) {
     e.preventDefault();
     
-    const emailInput = document.querySelector('#adminLogin input[type="email"]');
-    const passwordInput = document.querySelector('#adminLogin input[type="password"]');
+    const email = document.getElementById('adminEmail').value.trim();
+    const password = document.getElementById('adminPassword').value;
     
-    const email = emailInput.value.trim();
-    const password = passwordInput.value;
-    
-    // Validate input
-    if (!validateFormInput(email, password, 'admin')) {
+    // Validate
+    if (!validateLoginForm(email, password, 'admin')) {
         return;
     }
     
-    // Show loading state
-    const submitBtn = document.getElementById('adminSubmitBtn');
+    // Show loading
+    const submitBtn = document.querySelector('#adminForm .btn-login');
     if (submitBtn) submitBtn.classList.add('loading');
     
     // Simulate API delay
-    await simulateDelay(1000);
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
     // Process login
-    processLogin(email, password, 'admin');
+    const success = await processLogin(email, password, 'admin');
     
-    // Remove loading state
+    // Hide loading
     if (submitBtn) submitBtn.classList.remove('loading');
+    
+    if (success) {
+        showNotification('Login successful! Redirecting...', 'success');
+        setTimeout(() => {
+            window.location.href = 'Admin Dashboard.html';
+        }, 1500);
+    }
 }
 
 async function handleSignup(e) {
     e.preventDefault();
     
-    const nameInput = document.getElementById('signupName');
-    const emailInput = document.getElementById('signupEmail');
-    const passwordInput = document.getElementById('signupPassword');
-    const confirmPasswordInput = document.getElementById('signupConfirmPassword');
+    const name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    const confirmPassword = document.getElementById('signupConfirmPassword').value;
     const agreeTerms = document.getElementById('agreeTerms');
     
-    const name = nameInput.value.trim();
-    const email = emailInput.value.trim();
-    const password = passwordInput.value;
-    const confirmPassword = confirmPasswordInput.value;
-    
-    // Clear previous errors
+    // Clear errors
     clearFormErrors();
     
-    // Validate inputs
+    // Validate
+    if (!validateSignupForm(name, email, password, confirmPassword, agreeTerms)) {
+        return;
+    }
+    
+    // Show loading
+    const submitBtn = document.getElementById('signupBtn');
+    if (submitBtn) submitBtn.classList.add('loading');
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Process signup
+    const success = await processSignup(name, email, password);
+    
+    // Hide loading
+    if (submitBtn) submitBtn.classList.remove('loading');
+    
+    if (success) {
+        showNotification('Account created successfully! Redirecting...', 'success');
+        setTimeout(() => {
+            window.location.href = 'Employee Dashboard.html';
+        }, 1500);
+    }
+}
+
+function validateLoginForm(email, password, role) {
+    // Clear errors
+    clearFormErrors();
+    
+    let isValid = true;
+    
+    if (!email || !isValidEmail(email)) {
+        showError(`${role}EmailError`, 'Valid email is required');
+        isValid = false;
+    }
+    
+    if (!password) {
+        showError(`${role}PasswordError`, 'Password is required');
+        isValid = false;
+    }
+    
+    return isValid;
+}
+
+function validateSignupForm(name, email, password, confirmPassword, agreeTerms) {
     let isValid = true;
     
     if (!name) {
@@ -223,70 +309,76 @@ async function handleSignup(e) {
         isValid = false;
     }
     
-    if (!isValid) return;
-    
-    // Check if user already exists
-    const existingUsers = JSON.parse(localStorage.getItem('workSphereUsers') || '[]');
-    if (existingUsers.some(user => user.email === email)) {
-        showError('signupEmailError', 'Email already registered');
-        return;
-    }
-    
-    // Show loading state
-    const submitBtn = document.getElementById('signupSubmitBtn');
-    if (submitBtn) submitBtn.classList.add('loading');
-    
-    // Simulate API delay
-    await simulateDelay(1500);
-    
-    // Process signup
-    processSignup(name, email, password);
-    
-    // Remove loading state
-    if (submitBtn) submitBtn.classList.remove('loading');
+    return isValid;
 }
 
-// ===== LOGIN/SIGNUP PROCESSING =====
-function processLogin(email, password, role) {
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+function clearFormErrors() {
+    document.querySelectorAll('.error-message').forEach(el => {
+        el.textContent = '';
+        el.classList.remove('visible');
+    });
+}
+
+function showError(elementId, message) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.textContent = message;
+        element.classList.add('visible');
+    }
+}
+
+async function processLogin(email, password, role) {
     // Get stored users
     const storedUsers = JSON.parse(localStorage.getItem('workSphereUsers') || '[]');
     
     // Find user
     let user = storedUsers.find(u => u.email === email && u.role === role);
     
-    // If user doesn't exist, create demo user
+    // If user doesn't exist, check if it's a demo account
     if (!user) {
-        user = createDemoUser(email, password, role);
-        storedUsers.push(user);
-        localStorage.setItem('workSphereUsers', JSON.stringify(storedUsers));
+        // Check demo accounts
+        const demoAccounts = {
+            'employee@worksphere.com': { role: 'employee', password: 'demo123' },
+            'admin@worksphere.com': { role: 'admin', password: 'admin123' },
+            'sarah.johnson@worksphere.com': { role: 'employee', password: 'demo123' }
+        };
+        
+        if (demoAccounts[email] && demoAccounts[email].role === role) {
+            // Create demo user
+            user = createDemoUser(email, demoAccounts[email].password, role);
+            storedUsers.push(user);
+            localStorage.setItem('workSphereUsers', JSON.stringify(storedUsers));
+        } else {
+            showNotification('Invalid credentials', 'error');
+            return false;
+        }
     }
     
-    // Verify password for demo accounts
+    // Check password (for demo purposes, accept any password)
     if (user.password && user.password !== password) {
-        // For demo purposes, accept any password for demo accounts
-        if (!isDemoAccount(email)) {
-            showNotification('Invalid credentials', 'error');
-            return;
-        }
+        showNotification('Invalid credentials', 'error');
+        return false;
     }
     
     // Create session
     createUserSession(user);
     
-    // Show success message
-    showNotification(`Welcome ${user.name}!`, 'success');
-    
-    // Redirect to appropriate dashboard
-    setTimeout(() => {
-        if (role === 'admin') {
-            window.location.href = 'Admin Dashboard.html';
-        } else {
-            window.location.hpathref = 'Employee Dashboard.html';
-        }
-    }, 1500);
+    return true;
 }
 
-function processSignup(name, email, password) {
+async function processSignup(name, email, password) {
+    // Check if user already exists
+    const storedUsers = JSON.parse(localStorage.getItem('workSphereUsers') || '[]');
+    if (storedUsers.some(user => user.email === email)) {
+        showError('signupEmailError', 'Email already registered');
+        return false;
+    }
+    
     // Create new user
     const newUser = {
         id: generateUserId(),
@@ -297,27 +389,36 @@ function processSignup(name, email, password) {
         position: 'Employee',
         department: 'General',
         createdAt: new Date().toISOString(),
-        profileImage: getProfileImageData()
+        profileImage: await getProfileImageData()
     };
     
     // Add to stored users
-    const storedUsers = JSON.parse(localStorage.getItem('workSphereUsers') || '[]');
     storedUsers.push(newUser);
     localStorage.setItem('workSphereUsers', JSON.stringify(storedUsers));
     
     // Create session
     createUserSession(newUser);
     
-    // Show success message
-    showNotification('Account created successfully!', 'success');
-    
-    // Redirect to employee dashboard
-    setTimeout(() => {
-        window.location.href = 'Employee Dashboard.html';
-    }, 1500);
+    return true;
 }
 
-// ===== SESSION MANAGEMENT =====
+function createDemoUser(email, password, role) {
+    const name = email.split('@')[0];
+    const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
+    
+    return {
+        id: generateUserId(),
+        email: email,
+        password: password,
+        name: formattedName,
+        role: role,
+        position: role === 'admin' ? 'HR Manager' : 'Employee',
+        department: role === 'admin' ? 'Human Resources' : 'General',
+        createdAt: new Date().toISOString(),
+        profileImage: null
+    };
+}
+
 function createUserSession(user) {
     const sessionData = {
         id: user.id,
@@ -335,45 +436,6 @@ function createUserSession(user) {
     console.log('Session created for:', user.email);
 }
 
-function checkExistingSession() {
-    const sessionData = localStorage.getItem('workSphereSession');
-    
-    if (!sessionData) {
-        console.log('No existing session found');
-        return;
-    }
-    
-    try {
-        const user = JSON.parse(sessionData);
-        console.log('Found existing session for:', user.name);
-        
-        // Check session expiration (24 hours)
-        const loginTime = new Date(user.loginTime);
-        const currentTime = new Date();
-        const hoursDiff = (currentTime - loginTime) / (1000 * 60 * 60);
-        
-        if (hoursDiff < 24) {
-            // Auto-redirect based on role
-            showNotification(`Welcome back, ${user.name}!`, 'success');
-            setTimeout(() => {
-                if (user.role === 'admin') {
-                    window.location.href = 'Admin Dashboard.html';
-                } else {
-                    window.location.href = 'Employee Dashboard.html';
-                }
-            }, 1000);
-        } else {
-            // Session expired
-            localStorage.removeItem('workSphereSession');
-            showNotification('Session expired. Please login again.', 'info');
-        }
-    } catch (error) {
-        console.error('Error parsing session:', error);
-        localStorage.removeItem('workSphereSession');
-    }
-}
-
-// ===== DEMO USERS =====
 function initializeDemoUsers() {
     const existingUsers = localStorage.getItem('workSphereUsers');
     if (existingUsers) return;
@@ -418,34 +480,22 @@ function initializeDemoUsers() {
     console.log('Demo users initialized');
 }
 
-function createDemoUser(email, password, role) {
-    const name = email.split('@')[0];
-    const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
-    
-    return {
-        id: generateUserId(),
-        email: email,
-        password: password,
-        name: formattedName,
-        role: role,
-        position: role === 'admin' ? 'HR Manager' : 'Employee',
-        department: role === 'admin' ? 'Human Resources' : 'General',
-        createdAt: new Date().toISOString(),
-        profileImage: null
-    };
+function setupPasswordToggle() {
+    document.querySelectorAll('.show-password').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const input = this.parentElement.querySelector('input');
+            if (input.type === 'password') {
+                input.type = 'text';
+                this.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            } else {
+                input.type = 'password';
+                this.innerHTML = '<i class="fas fa-eye"></i>';
+            }
+        });
+    });
 }
 
-function isDemoAccount(email) {
-    const demoEmails = [
-        'admin@worksphere.com',
-        'employee@worksphere.com',
-        'sarah.johnson@worksphere.com'
-    ];
-    return demoEmails.includes(email);
-}
-
-// ===== IMAGE UPLOAD =====
-function setupImageUpload() {
+function setupImagePreview() {
     const imageInput = document.getElementById('profileImage');
     const preview = document.getElementById('imagePreview');
     
@@ -483,7 +533,7 @@ function setupImageUpload() {
     });
 }
 
-function getProfileImageData() {
+async function getProfileImageData() {
     const imageInput = document.getElementById('profileImage');
     if (!imageInput || !imageInput.files[0]) return null;
     
@@ -504,50 +554,6 @@ function removeProfileImage() {
     if (preview) preview.innerHTML = '';
 }
 
-// ===== UTILITY FUNCTIONS =====
-function validateFormInput(email, password, role) {
-    // Clear previous errors
-    clearFormErrors();
-    
-    let isValid = true;
-    
-    if (!email || !isValidEmail(email)) {
-        showError(`${role}EmailError`, 'Valid email is required');
-        isValid = false;
-    }
-    
-    if (!password) {
-        showError(`${role}PasswordError`, 'Password is required');
-        isValid = false;
-    }
-    
-    return isValid;
-}
-
-function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
-
-function clearFormErrors() {
-    document.querySelectorAll('.error-message').forEach(el => {
-        el.textContent = '';
-        el.classList.remove('visible');
-    });
-}
-
-function showError(elementId, message) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.textContent = message;
-        element.classList.add('visible');
-    }
-}
-
-async function simulateDelay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 function generateUserId() {
     return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 }
@@ -556,44 +562,46 @@ function generateSessionId() {
     return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 12);
 }
 
-// ===== NOTIFICATION SYSTEM =====
 function showNotification(message, type = 'info') {
-    const notification = document.getElementById('notification');
-    const messageEl = document.getElementById('notificationMessage');
-    const icon = notification.querySelector('i');
+    const toast = document.getElementById('toastNotification');
+    const messageEl = document.getElementById('toastMessage');
+    const icon = toast.querySelector('.toast-icon');
     
-    if (!notification || !messageEl) return;
+    if (!toast || !messageEl) return;
     
-    // Set message and type
+    // Set message
     messageEl.textContent = message;
     
-    // Update icon and colors
+    // Update icon and color
     if (type === 'success') {
-        icon.className = 'fas fa-check-circle';
-        notification.style.background = '#10b981';
+        icon.className = 'fas fa-check-circle toast-icon';
+        toast.style.background = 'var(--success-500)';
     } else if (type === 'error') {
-        icon.className = 'fas fa-exclamation-circle';
-        notification.style.background = '#ef4444';
+        icon.className = 'fas fa-exclamation-circle toast-icon';
+        toast.style.background = 'var(--danger-500)';
     } else {
-        icon.className = 'fas fa-info-circle';
-        notification.style.background = '#3b82f6';
+        icon.className = 'fas fa-info-circle toast-icon';
+        toast.style.background = 'var(--primary-500)';
     }
     
-    // Show notification
-    notification.style.display = 'flex';
-    notification.classList.remove('hiding');
+    // Show toast
+    toast.style.display = 'flex';
+    toast.classList.remove('hiding');
     
-    // Auto-hide after 4 seconds
+    // Auto-hide
     setTimeout(() => {
-        notification.classList.add('hiding');
+        toast.classList.add('hiding');
         setTimeout(() => {
-            notification.style.display = 'none';
+            toast.style.display = 'none';
         }, 300);
     }, 4000);
 }
 
-// ===== PASSWORD VISIBILITY TOGGLE =====
-function togglePasswordVisibility(inputId) {
+// Global functions for onclick handlers
+window.switchTab = switchTab;
+window.showSignup = showSignupForm;
+window.showLogin = showLoginForm;
+window.togglePassword = function(inputId) {
     const input = document.getElementById(inputId);
     const toggleBtn = input.nextElementSibling;
     const icon = toggleBtn.querySelector('i');
@@ -605,55 +613,7 @@ function togglePasswordVisibility(inputId) {
         input.type = 'password';
         icon.className = 'fas fa-eye';
     }
-}
-
-// ===== GLOBAL AUTH FUNCTIONS =====
-window.Auth = {
-    getCurrentUser: function() {
-        const sessionData = localStorage.getItem('workSphereSession');
-        return sessionData ? JSON.parse(sessionData) : null;
-    },
-    
-    isAuthenticated: function() {
-        const user = this.getCurrentUser();
-        if (!user) return false;
-        
-        // Check session expiration
-        const loginTime = new Date(user.loginTime);
-        const currentTime = new Date();
-        const hoursDiff = (currentTime - loginTime) / (1000 * 60 * 60);
-        
-        return hoursDiff < 24;
-    },
-    
-    requireAuth: function(requiredRole = null) {
-        const user = this.getCurrentUser();
-        
-        if (!user || !this.isAuthenticated()) {
-            window.location.href = 'Login.html';
-            return false;
-        }
-        
-        if (requiredRole && user.role !== requiredRole) {
-            showNotification(`Access denied. ${requiredRole} role required.`, 'error');
-            setTimeout(() => {
-                window.location.href = 'Login.html';
-            }, 2000);
-            return false;
-        }
-        
-        return true;
-    },
-    
-    logout: function() {
-        localStorage.removeItem('workSphereSession');
-        window.location.href = 'Login.html';
-    }
 };
-
-// ===== GLOBAL FUNCTIONS =====
-window.showModal = showModal;
-window.togglePasswordVisibility = togglePasswordVisibility;
 window.removeProfileImage = removeProfileImage;
 
 console.log('WorkSphere Login System Ready');
